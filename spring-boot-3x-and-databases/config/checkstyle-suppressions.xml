@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+ 
+<!DOCTYPE suppressions PUBLIC
+     "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+     "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+ 
+<suppressions>
+	<!-- temporary, while the issues are tracked down -->
+	<suppress files="." checks="MissingJavadocMethod"/>
+	<suppress files="." checks="MissingJavadocType"/>
+	<suppress files="." checks="NonEmptyAtclauseDescription"/>
+	<suppress files="." checks="SummaryJavadoc"/>
+
+	<!-- permanent since we're using Markdown formatting -->
+	<suppress files="." checks="JavadocParagraph"/>
+
+	<!-- this is a jooq convention -->
+	<!-- this doesn't work :-( -->
+	<suppress
+		files=".\/jooq\/bindings\/."
+		checks="OverrideMethodsDeclarationOrder"/>
+
+</suppressions>

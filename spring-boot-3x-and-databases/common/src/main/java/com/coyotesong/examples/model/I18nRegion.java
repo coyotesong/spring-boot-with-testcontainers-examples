@@ -27,14 +27,14 @@ import java.io.Serializable;
 
 /**
  * YouTube I18nRegion
- * <p>
+ *
  * YouTube provides information on 110 regions
- * <p>
+ *
  * YouTube provides information in 83 locales (80 unique - (en, en-GB, en-IN) and (es-US, es-419) share parent etag
- * <p>
+ *
  * see <a href="https://googleapis.dev/java/google-api-services-youtube/latest/com/google/api/services/youtube/model/I18nRegion.html">I18nRegion</a>
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("JavadocBlankLines")
 public class I18nRegion implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -88,19 +88,21 @@ public class I18nRegion implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o instanceof I18nRegion that) {
+            return new EqualsBuilder()
+                    // DO NOT INCLUDE KEY!
+                    .append(code, that.code)
+                    .append(name, that.name)
+                    .append(hl, that.hl)
+                    .append(gl, that.gl)
+                    .isEquals();
+        }
 
-        final I18nRegion that = (I18nRegion) o;
-
-        return new EqualsBuilder()
-                // DO NOT INCLUDE KEY!
-                .append(code, that.code)
-                .append(name, that.name)
-                .append(hl, that.hl)
-                .append(gl, that.gl)
-                .isEquals();
+        return false;
     }
 
     @Override

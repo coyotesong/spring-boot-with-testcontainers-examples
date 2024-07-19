@@ -17,6 +17,8 @@
 
 package com.coyotesong.examples.persistence.config;
 
+import com.coyotesong.examples.containers.enhancements.HikariConnectionPoolHelper;
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @PropertySource(value = "file:///${user.home}/.config/youtube.properties")
 @ConfigurationPropertiesScan
 @Profile("dev")
+@SuppressWarnings("JavadocBlankLines")
 public class DevJdbcProperties {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(DevJdbcProperties.class);
@@ -61,7 +64,7 @@ public class DevJdbcProperties {
     /**
      * Datasource properties
      *
-     * @return
+     * @return connection details
      */
     @Bean
     public DataSourceProperties dataSourceProperties() {
@@ -78,24 +81,29 @@ public class DevJdbcProperties {
 
     /**
      * Hikari DataSource
-     * <p>
-     * We specify HikariDataSource, not the more general DataSource, since
-     * it is Autocloseable and this simplifies proper connection management.
      *
-     * @return
+     * We specify HikariDataSource, not the more general DataSource, since
+     * it is closeable and this simplifies proper connection management.
+     *
+     * @param dataSourceProperties connection details
+     * @return dataSource
      */
-    @Bean
+    @Bean(destroyMethod = "close")
     @NotNull
     public HikariDataSource dataSource(@Autowired DataSourceProperties dataSourceProperties) {
-        final HikariDataSource ds = dataSourceProperties
-                .initializeDataSourceBuilder()
-                .type(HikariDataSource.class)
-                .build();
+        final HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(dataSourceProperties.getUrl());
+        config.setUsername(dataSourceProperties.getUsername());
+        config.setPassword(dataSourceProperties.getPassword());
 
-        if (isNotBlank(testQueryString)) {
-            ds.setConnectionTestQuery(testQueryString);
+        if (isNotBlank(dataSourceProperties.getDriverClassName())) {
+            config.setDataSourceClassName(dataSourceProperties.getDriverClassName());
         }
 
-        return ds;
+        if (isNotBlank(testQueryString)) {
+            config.setConnectionTestQuery(testQueryString);
+        }
+
+        return HikariConnectionPoolHelper.INSTANCE.getDataSource(config);
     }
 }

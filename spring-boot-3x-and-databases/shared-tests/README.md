@@ -29,12 +29,12 @@ race conditions between test classes. I'm investigating solutions but
 this has to be balanced with the benefits of test isolation.
 
 Example:
+
 ```java
 import com.coyotesong.examples.config.PersistenceTestConfiguration;
 import com.coyotesong.examples.containers.PostgreSQLContainerWithFlyway;
 import com.coyotesong.examples.repository.I18nLanguageRepository;
 import com.coyotesong.examples.repository.I18nLanguageRepositoryTests;
-import com.coyotesong.examples.repository.TestObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -22,8 +22,6 @@ import com.coyotesong.examples.persistence.jooq.I18nRegionRepositoryJooq;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.JdbcConnectionDetails;
 import org.springframework.boot.autoconfigure.jooq.JooqExceptionTranslator;
@@ -31,8 +29,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.testcontainers.shaded.com.google.common.base.Splitter;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * Configure jooq-related properties
@@ -44,26 +44,57 @@ import javax.sql.DataSource;
 })
 @Profile("jooq")
 public class TestJooqProperties {
-    private static final Logger LOG = LoggerFactory.getLogger(TestJooqProperties.class);
 
-    // @Value("${jooq.sql.dialect:POSTGRES}")
-    // private String dialect;
-
+    /**
+     * Get jOOQ SQLDialect based on connection info
+     *
+     * @param connectionDetails connection info
+     * @return jOOQ SQLDialect
+     */
     @Bean
     public SQLDialect dialect(@Autowired JdbcConnectionDetails connectionDetails) {
-        if (connectionDetails.getJdbcUrl().contains(":mysql:")) {
-            return SQLDialect.MYSQL;
-        } else if (connectionDetails.getJdbcUrl().contains(":postgresql:")) {
-            return SQLDialect.POSTGRES;
-        } else {
+        final List<String> components = Splitter.on(':').splitToList(connectionDetails.getJdbcUrl());
+        if (components.size() < 2) {
             return SQLDialect.DEFAULT;
         }
+
+        // note: cockroachdb reports 'postgresql'
+        // note: questdb reports 'postgresql'
+        // note: tidb reports 'mysql'
+        // note: timescale reports 'postgresql'
+        switch (components.get(1).toLowerCase()) {
+            case "mariadb":
+                return SQLDialect.MARIADB;
+            case "mysql":
+                return SQLDialect.MYSQL;
+            case "postgresql":
+                return SQLDialect.POSTGRES;
+            case "trino":
+                return SQLDialect.TRINO;
+            case "yugabytedb":
+                return SQLDialect.YUGABYTEDB;
+
+            // enterprise options
+            case "db2":
+            case "oracle":
+            case "sqlserver":
+                return SQLDialect.DEFAULT;
+
+            // other
+            case "clickhouse":
+                return SQLDialect.DEFAULT;
+        }
+
+        // catchall
+        return SQLDialect.DEFAULT;
     }
 
     /**
      * jOOQ configuration
      *
-     * @return
+     * @param connectionProvider jOOQ connection provider
+     * @param dialect            jOOQ SQLDialect
+     * @return jOOQ configuration
      */
     @Bean
     public org.jooq.Configuration jooqConfiguration(@Autowired DataSourceConnectionProvider connectionProvider, @Autowired SQLDialect dialect) {
@@ -88,7 +119,7 @@ public class TestJooqProperties {
     /**
      * jOOQ Settings
      *
-     * @return
+     * @return jOOQ settings
      */
     @Bean
     public Settings settings() {
@@ -98,15 +129,21 @@ public class TestJooqProperties {
         return settings;
     }
 
+    /**
+     * Get jOOQ connection provider
+     *
+     * @param dataSource dataSource
+     * @return jOOQ connection provider
+     */
     @Bean
     public DataSourceConnectionProvider connectionProvider(@Autowired DataSource dataSource) {
         return new DataSourceConnectionProvider(dataSource);
     }
 
     /**
-     * Closeable DSLContext
+     * Get closeable DSLContext
      *
-     * @return
+     * @return jOOQ DSLContext
      */
     @Bean
     public DefaultDSLContext dsl(@Autowired DataSourceConnectionProvider connectionProvider, @Autowired SQLDialect dialect) {
@@ -123,7 +160,7 @@ public class TestJooqProperties {
     /**
      * Class that converts jOOQ exceptions to Spring DataExceptions
      *
-     * @return
+     * @return jOOQ exception translator
      */
     @Bean
     public JooqExceptionTranslator exceptionTransformer() {

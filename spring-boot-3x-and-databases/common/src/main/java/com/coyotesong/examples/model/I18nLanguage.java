@@ -29,15 +29,15 @@ import java.io.Serializable;
 
 /**
  * YouTube I18nLanguage
- * <p>
+ *
  * Youtube provides information in 83 locales (82 unique - 'en' and 'en-GB' share parent etag)
- * <p>
+ *
  * see <a href="https://googleapis.dev/java/google-api-services-youtube/latest/com/google/api/services/youtube/model/I18nLanguage.html">I18nLanguage</a>
  * see https://en.wikipedia.org/wiki/Codes_for_constructed_languages
  * see https://en.wikipedia.org/wiki/IETF_language_tag
  */
 //@Table
-@SuppressWarnings("unused")
+@SuppressWarnings("JavadocBlankLines")
 public class I18nLanguage implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -46,8 +46,6 @@ public class I18nLanguage implements Serializable {
     private String code;
     private String name;
     private String hl;  // ISO 639 / BCP-47 code
-    private String etag;
-    private String parentEtag;
 
     //@Id
     //@GeneratedValue(strategy = AUTO)
@@ -88,18 +86,20 @@ public class I18nLanguage implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o instanceof I18nLanguage that) {
+            return new EqualsBuilder()
+                    // DO NOT INCLUDE KEY!
+                    .append(code, that.code)
+                    .append(name, that.name)
+                    .append(hl, that.hl)
+                    .isEquals();
+        }
 
-        final I18nLanguage that = (I18nLanguage) o;
-
-        return new EqualsBuilder()
-                // DO NOT INCLUDE KEY!
-                .append(code, that.code)
-                .append(name, that.name)
-                .append(hl, that.hl)
-                .isEquals();
+        return false;
     }
 
     @Override
