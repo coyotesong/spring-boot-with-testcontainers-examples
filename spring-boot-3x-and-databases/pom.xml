@@ -83,6 +83,7 @@
         <!-- maven dependencies -->
         <maven.version>3.8.7</maven.version> <!-- 3.6.3 on Ubuntu 22.04? -->
         <maven-artifact-transfer.version>0.13.1</maven-artifact-transfer.version>
+        <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
         <maven-failsafe-plugin.version>3.3.1</maven-failsafe-plugin.version>
@@ -94,6 +95,8 @@
 
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <error-prone.version>2.3.4</error-prone.version>
+
+        <checkstyle.version>10.17.0</checkstyle.version>
 
         <owasp-dependency-check.version>10.0.3</owasp-dependency-check.version>
 
@@ -275,6 +278,31 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven-checkstyle-plugin.version}</version>
+                    <configuration>
+                        <configLocation>google_checks.xml</configLocation>
+                        <!--
+                        <checkstyleRules>
+                            <module name="Checker">
+                                    <module name="LineLength">
+                                        <property name="max" value="120" />
+                                    </module>
+                                </module>
+                        </checkstyleRules>
+                        -->
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
@@ -364,6 +392,7 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <quiet>true</quiet>
                         <useStandardDocletOptions>true</useStandardDocletOptions>
                         <doclet>org.jdrupes.mdoclet.MDoclet</doclet>
                         <docletArtifacts>
@@ -601,7 +630,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
                 <maven-dependency-plugin.version>3.7.1</maven-dependency-plugin.version>
                 <maven-project-info-reports-plugin.version>3.6.2</maven-project-info-reports-plugin.version>
                 <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
@@ -612,10 +640,9 @@
 
                 <doxia.version>1.11.1</doxia.version>
 
-                <checkstyle.version>10.17.0</checkstyle.version>
                 <license-maven-plugin.version>2.4.0</license-maven-plugin.version>
                 <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
-                <owasp-dependency-check.version>10.0.3</owasp-dependency-check.version>
+                <!-- <owasp-dependency-check.version>10.0.3</owasp-dependency-check.version> -->
             </properties>
 
             <build>
@@ -701,6 +728,18 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>license-maven-plugin</artifactId>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>checkstyle-aggregate</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
                     </plugin>
 
                     <plugin>
