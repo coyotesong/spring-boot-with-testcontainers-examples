@@ -92,11 +92,12 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
+                            <detectLinks>false</detectLinks>
                             <!-- <reportOutputDirectory>${javadoc.output.directory}</reportOutputDirectory> -->
                         </configuration>
                         <reportSets>
-                            <reportSet><!-- by default, id = "default" -->
-                                <reports><!-- select non-aggregate reports -->
+                            <reportSet>
+                                <reports>
                                     <report>javadoc</report>
                                     <report>test-javadoc</report>
                                 </reports>

@@ -38,8 +38,6 @@
     </description>
 
     <properties>
-        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
-
         <postgresql-docker.version>latest</postgresql-docker.version>
 
         <jooq.target.directory>src/main/java.jooq</jooq.target.directory>
@@ -85,16 +83,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>${build-helper-maven-plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -198,6 +186,11 @@
                         <artifactId>spring-boot-starter-jooq</artifactId>
                         <version>${spring-boot.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>testcontainers</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
                 </dependencies>
             </dependencyManagement>
             <build>
@@ -242,7 +235,7 @@
                                         project.properties.setProperty('db.url', db.getJdbcUrl());
                                         project.properties.setProperty('testcontainer.containerid', db.getContainerId());
                                         project.properties.setProperty('testcontainer.imageName', db.getDockerImageName());
-                                </source>
+                                    </source>
                                 </configuration>
                             </execution>
                             <execution>
@@ -264,6 +257,13 @@
                             </execution>
                         </executions>
                         <dependencies>
+                            <!--
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>testcontainers</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                            -->
                             <dependency>
                                 <groupId>org.testcontainers</groupId>
                                 <artifactId>postgresql</artifactId>
@@ -368,6 +368,15 @@
                                 </configuration>
                             </execution>
                         </executions>
+                        <!--
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>testcontainers</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                        </dependencies>
+                        -->
                     </plugin>
                 </plugins>
             </build>
