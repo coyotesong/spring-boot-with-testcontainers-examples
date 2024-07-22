@@ -95,6 +95,8 @@
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <error-prone.version>2.3.4</error-prone.version>
 
+        <owasp-dependency-check.version>10.0.3</owasp-dependency-check.version>
+
         <!-- these are tied to the spring boot version -->
         <spring-boot.version>3.3.2</spring-boot.version>
         <flyway.version>10.16.0</flyway.version>
@@ -250,6 +252,28 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${owasp-dependency-check.version}</version>
+                    <!--
+                    suppress false positives - company wide or local file
+                    <configuration>
+                        <suppressionFiles>
+                            <suppressionFile>http://example.org/suppression.xml</suppressionFile>
+                            <suppressionFile>project-suppression.xml</suppressionFile>
+                        </suppressionFiles>
+                    </configuration>
+                    -->
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
@@ -258,7 +282,7 @@
                         <fork>true</fork>
                         <meminitial>256m</meminitial>
                         <maxmem>1024m</maxmem>
-                        <encoding>UTF-8</encoding>
+                        <encoding>${project.build.sourceEncoding}</encoding>
                         <compilerArgs>
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
@@ -500,6 +524,11 @@
 
         <plugins>
             <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
@@ -657,6 +686,18 @@
 
             <reporting>
                 <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>license-maven-plugin</artifactId>
