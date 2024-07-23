@@ -11,7 +11,7 @@ import com.coyotesong.examples.persistence.jooq.generated.tables.I18nRegion;
 /**
  * Convenience access to all tables in public.
  */
-@SuppressWarnings({"all", "unchecked", "rawtypes", "this-escape"})
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**

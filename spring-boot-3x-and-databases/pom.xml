@@ -159,12 +159,17 @@
         <activation-api.version>2.1.3</activation-api.version>
         <annotation-api.version>2.1.1</annotation-api.version>
         <xml.bind-api.version>4.0.2</xml.bind-api.version>
-        <persistence-api.version>3.1.0</persistence-api.version>
+        <persistence-api.version>3.2.0</persistence-api.version>
 
         <jackson.version>2.17.1</jackson.version>
         <hikari.version>5.1.0</hikari.version>
         <docker-java-api.version>3.3.6</docker-java-api.version>
-        <mockito.version>5.11.0</mockito.version>
+        <mockito.version>5.12.0</mockito.version>
+
+        <!-- implied by spring-boot -->
+        <springframework.version>6.1.10</springframework.version>
+
+        <!--<javadoc.output.dir>${project.reporting.outputDirectory}/apidocs</javadoc.output.dir> -->
     </properties>
 
     <dependencyManagement>
@@ -178,6 +183,14 @@
                 <scope>import</scope>
             </dependency>
             -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
@@ -224,7 +237,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.13.0</version>
+                <version>3.15.0</version>
             </dependency>
 
             <dependency>
@@ -232,11 +245,13 @@
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
                 <version>${flyway.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
@@ -295,7 +310,7 @@
                     <configuration>
                         <suppressionFiles>
                             <suppressionFile>http://example.org/suppression.xml</suppressionFile>
-			                <suppressionFile>project-suppression.xml</suppressionFile>
+                            <suppressionFile>project-suppression.xml</suppressionFile>
                         </suppressionFiles>
                     </configuration>
                     -->
@@ -377,6 +392,197 @@
                                 <version>${error-prone.version}</version>
                             </path>
                         </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>[${maven.version},)</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- moved here from 'site' profile so it can be seen by child projects -->
+                <!-- javadoc can contain markdown instead of html. Still produces html. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <!-- do not use 3.5.1: transitive dependencies of docletArtifact are not added to
+                         docletpath, version 3.5.1 resolves this issue. https://issues.apache.org/jira/browse/  MJAVADOC-742 -->
+                    <version>${maven-javadoc-plugin.version}</version>
+                    <executions>
+                        <!--
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                        -->
+                        <execution>
+                            <id>aggregate</id>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                            <phase>site</phase>
+                            <configuration>
+                                <!-- Specific configuration for the aggregate report -->
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>resource-bundles</id>
+                            <phase>package</phase>
+                            <goals>
+                                <!-- produce source artifact for main project sources -->
+                                <goal>resource-bundle</goal>
+
+                                <!-- produce source artifact for project test sources -->
+                                <goal>test-resource-bundle</goal>
+                            </goals>
+                            <configuration>
+                                <detectOfflineLinks>false</detectOfflineLinks>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <quiet>true</quiet>
+                        <useStandardDocletOptions>true</useStandardDocletOptions>
+                        <doclet>org.jdrupes.mdoclet.MDoclet</doclet>
+                        <docletArtifacts>
+                            <docletArtifact>
+                                <groupId>org.jdrupes.mdoclet</groupId>
+                                <artifactId>doclet</artifactId>
+                                <version>4.2.0</version>
+                            </docletArtifact>
+                            <docletArtifact>
+                                <groupId>com.vladsch.flexmark</groupId>
+                                <artifactId>flexmark-all</artifactId>
+                                <version>0.64.8</version>
+                            </docletArtifact>
+                        </docletArtifacts>
+                        <!--  Note: additionalDependencies are added to the -classpath, not the docletpath -->
+                        <additionalDependencies>
+                        </additionalDependencies>
+                        <additionalJOptions>
+                            <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.doclint=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>-J--add-exports=jdk.javadoc/jdk.javadoc.internal.doclets.toolkit=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>-J--add-exports=jdk.javadoc/jdk.javadoc.internal.tool=ALL-UNNAMED</additionalJOption>
+                        </additionalJOptions>
+                        <detectLinks>false</detectLinks>
+                        <links>
+                            <link>https://docs.oracle.com/en/java/javase/${maven.compiler.target}/docs/api/</link>
+                            <!-- <link>https://docs.oracle.com/en/java/javase/${maven.compiler.target}/docs/api/java.base/</link> -->
+
+                            <!-- named modules -->
+                            <!-- <link>https://javadoc.io/doc/jakarta.activation/jakarta.activation-api/${activation-api.version}</link> -->
+                            <!-- <link>https://javadoc.io/doc/jakarta.annotation/jakarta.annotation-api/${annotation-api.version}/</link> -->
+                            <!-- <link>https://javadoc.io/doc/jakarta.persistence/jakarta.persistence-api/${persistence-api.version}/</link> -->
+                            <!-- <link>https://javadoc.io/doc/jakarta.xml.bind/jakarta.xml.bind-api/${xml.bind-api.version}/</link> -->
+
+                            <!-- <link>https://javadoc.io/doc/org.jooq/jooq/${joojooqq.version}/</link> -->
+
+                            <link>https://javadoc.io/doc/org.slf4j/slf4j-api/${slf4j.version}/</link>
+
+                            <!-- testing -->
+                            <link>https://javadoc.io/doc/org.junit.jupiter/junit-jupiter-api/5.10.3/</link>
+                            <link>https://javadoc.io/doc/junit/junit/4.13.2/</link> <!-- for org.junit.rules.TestRule -->
+
+                            <link>https://javadoc.io/doc/org.hamcrest/hamcrest/${hamcrest.version}</link>
+                            <link>https://javadoc.io/doc/org.hamcrest/hamcrest-core/${hamcrest.version}</link>
+                            <link>https://javadoc.io/doc/org.mockito/mockito-core/${mockito.version}/</link>
+                            <link>https://javadoc.io/doc/org.mockito/mockito-junit-jupiter/${mockito.version}/</link>
+
+                            <!-- test containers and docker -->
+                            <link>https://javadoc.io/doc/com.github.docker-java/docker-java-api/${docker-java-api.version}</link>
+                            <link>https://javadoc.io/doc/org.testcontainers/testcontainers/${testcontainers.version}/</link>
+                            <link>https://javadoc.io/doc/org.testcontainers/junit-jupiter/${testcontainers.version}/</link>
+
+                            <link>https://javadoc.io/doc/org.testcontainers/database-commons/${testcontainers.version}/</link>
+                            <link>https://javadoc.io/doc/org.testcontainers/jdbc/${testcontainers.version}/</link>
+                            <link>https://javadoc.io/doc/org.testcontainers/postgresql/${testcontainers.version}/</link>
+
+                            <!-- spring -->
+                            <link>https://javadoc.io/doc/org.springframework/spring-aop/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-beans/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-context/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-core/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-expression/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-jcl/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-jdbc/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-test/${springframework.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework/spring-tx/${springframework.version}/</link>
+
+                            <!-- spring boot -->
+                            <link>https://javadoc.io/doc/org.springframework.boot/spring-boot-autoconfigure/${spring-boot.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework.boot/spring-boot-test/${spring-boot.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework.boot/spring-boot-test-autoconfigure/${spring-boot.version}/</link>
+                            <link>https://javadoc.io/doc/org.springframework.boot/spring-boot-testcontainers/${spring-boot.version}/</link>
+
+                            <!-- jooq -->
+                            <link>https://javadoc.io/doc/org.jooq/jooq/${jooq.version}/</link>
+                            <link>https://javadoc.io/doc/org.flywaydb/flyway-core/${flyway.version}/</link>
+                            <link>https://javadoc.io/doc/org.flywaydb/flyway-database-postgresql/${flyway.version}/</link>
+
+                            <!-- jackson -->
+                            <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/${jackson.version}/</link>
+                            <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/${jackson.version}/</link>
+                            <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/${jackson.version}/</link>
+                            <link>https://javadoc.io/doc/com.fasterxml.jackson.dataformat/jackson-dataformat-toml/${jackson.version}/</link>
+
+                            <link>https://javadoc.io/doc/org.apache.commons/commons-compress/1.24.0/</link>
+                            <link>https://javadoc.io/doc/org.apache.commons/commons-lang3/3.13.0</link>
+
+                            <link>https://javadoc.io/doc/org.jetbrains/annotations/${jetbrains.version}/</link>
+
+                            <!-- test scope -->
+                            <link>https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/2.21.1/</link>
+                            <link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.9.0/</link>
+                            <link>https://javadoc.io/doc/commons-codec/commons-codec/1.16.1/</link>
+                            <link>https://javadoc.io/doc/commons-logging/commons-logging/1.2/</link>
+                            <!-- <link>https://javadoc.io/doc/org.xml/xmlunit-core/2.9.1</link> -->
+                            <link>https://javadoc.io/doc/org.yaml/snakeyaml/2.2/</link>
+                        </links>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jxr-plugin</artifactId>
+                    <version>${maven-jxr-plugin.version}</version>
+                    <configuration>
+                        <linkJavadoc>true</linkJavadoc>
+                        <!-- <javadocDir>${javadoc.output.directory}</javadocDir> -->
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>${maven-pmd-plugin.version}</version>
+                    <configuration>
+                        <linkXRef>true</linkXRef>
+                        <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+                        <minimumTokens>100</minimumTokens>
+                        <targetJdk>${maven.compiler.target}</targetJdk>
                     </configuration>
                 </plugin>
 
@@ -702,11 +908,11 @@
                     </executions>
                 </plugin>
 
+                <!--
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar-plugin.version}</version>
-                    <!--
                     <executions>
                         <execution>
                             <goals>
@@ -714,8 +920,8 @@
                             </goals>
                         </execution>
                     </executions>
-                    -->
                 </plugin>
+                -->
             </plugins>
         </pluginManagement>
 
@@ -943,6 +1149,7 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1248,10 +1455,12 @@
                         </reportSets>
                     </plugin>
 
+                    <!--
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
                     </plugin>
+                    -->
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

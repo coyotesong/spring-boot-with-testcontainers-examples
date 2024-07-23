@@ -34,8 +34,6 @@
     </description>
 
     <properties>
-        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
-
         <postgresql-docker.version>latest</postgresql-docker.version>
 
         <jooq.target.directory>src/main/java.jooq</jooq.target.directory>
@@ -140,6 +138,63 @@
 
     <profiles>
         <profile>
+            <id>site</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <!-- <reportOutputDirectory>${javadoc.output.directory}</reportOutputDirectory> -->
+                        </configuration>
+                        <reportSets>
+                            <reportSet><!-- by default, id = "default" -->
+                                <reports><!-- select non-aggregate reports -->
+                                    <report>javadoc</report>
+                                    <report>test-javadoc</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jxr-plugin</artifactId>
+                        <version>${maven-jxr-plugin.version}</version>
+                        <configuration>
+                            <linkJavadoc>true</linkJavadoc>
+                            <!-- <javadocDir>${javadoc.output.directory}</javadocDir> -->
+                        </configuration>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>jxr</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+
+                    <plugin>
+                        <!-- skip CMD -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>pmd</report>
+                                    <!-- <report>cpd</report> -->
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+
+        <profile>
             <id>codegen</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -160,6 +215,11 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-jooq</artifactId>
                         <version>${spring-boot.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>testcontainers</artifactId>
+                        <version>${testcontainers.version}</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -196,10 +256,10 @@
                                 </goals>
                                 <configuration>
                                     <source>
-                                        db = new org.testcontainers.containers.PostgreSQLContainer("postgres:${postgresql - docker.version}")
+                                        db = new org.testcontainers.containers.PostgreSQLContainer("postgres:${postgresql-docker.version}")
                                                 .withUsername("${db.username}")
                                                 .withDatabaseName("postgres")
-                                                .withPassword("${db.password}");
+                                                .withPassword("${db.password}")
 
                                         db.start();
                                         project.properties.setProperty('db.url', db.getJdbcUrl());
@@ -221,12 +281,19 @@
                                         println("Stopping testcontainer $containerId-$imageName")
                                         org.testcontainers.utility.ResourceReaper
                                                 .instance()
-                                                .stopAndRemoveContainer(containerId, imageName);
+                                                .stopAndRemoveContainer(containerId, imageName)
                                     </source>
                                 </configuration>
                             </execution>
                         </executions>
                         <dependencies>
+                            <!--
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>testcontainers</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                            -->
                             <dependency>
                                 <groupId>org.testcontainers</groupId>
                                 <artifactId>postgresql</artifactId>
@@ -331,6 +398,15 @@
                                 </configuration>
                             </execution>
                         </executions>
+                        <!--
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>testcontainers</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                        </dependencies>
+                        -->
                     </plugin>
                 </plugins>
             </build>
