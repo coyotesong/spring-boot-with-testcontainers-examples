@@ -22,19 +22,15 @@
     <parent>
         <groupId>com.coyotesong.examples.spring-boot</groupId>
         <artifactId>databases</artifactId>
-        <version>0.9</version>
+        <version>0.9-SNAPSHOT</version>
     </parent>
     <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
     <artifactId>jooq</artifactId>
     <packaging>jar</packaging>
 
-    <name>Spring Boot 3.2 and Databases - jOOQ implementation</name>
+    <name>jOOQ implementation</name>
     <description>
-        This project demonstrates how to use Spring Boot 3.2 with
-        database test containers.
-
-        It also includes flyway (schema management) and jOOQ (database
-        integration).
+        Persistence implemented using jOOQ.
     </description>
 
     <properties>
@@ -59,7 +55,7 @@
             <dependency>
                 <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
                 <artifactId>common</artifactId>
-                <version>${project.version}</version>
+                <version>${project.parent.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -83,6 +79,37 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <configuration>
+                        <configLocation>${checkstyle.config.location}</configLocation>
+                        <excludeGeneratedSources>true</excludeGeneratedSources>
+                        <!-- do not include jooq-generated source code -->
+                        <sourceDirectories>
+                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                        </sourceDirectories>
+                        <!-- <excludes>**\/generated\/**</excludes> -->
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -172,6 +199,9 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <properties>
+                <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
+            </properties>
             <dependencyManagement>
                 <dependencies>
                     <dependency>
@@ -199,7 +229,7 @@
                         <plugin>
                             <groupId>org.codehaus.gmaven</groupId>
                             <artifactId>groovy-maven-plugin</artifactId>
-                            <version>2.1.1</version>
+                            <version>${groovy-maven-plugin.version}</version>
                         </plugin>
                         <plugin>
                             <groupId>org.flywaydb</groupId>

@@ -22,30 +22,26 @@
     <parent>
         <groupId>com.coyotesong.examples.spring-boot</groupId>
         <artifactId>databases</artifactId>
-        <version>0.9</version>
+        <version>0.9-SNAPSHOT</version>
     </parent>
     <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
     <artifactId>shared-tests</artifactId>
     <packaging>jar</packaging>
 
-    <name>Spring Boot 3.2 and Databases - Shared Tests</name>
+    <name>Shared Tests</name>
     <description>
-        This project demonstrates how to use Spring Boot 3.2 with
-        database test containers.
-
-        It also includes flyway (schema management) and jOOQ (database
-        integration).
+        Tests that can shared across both database servers and persistence implementations.
     </description>
-
-    <properties>
-        <jooq.version>3.19.10</jooq.version>
-        <postgresql-jdbc.version>42.7.3</postgresql-jdbc.version>
-    </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
+                <artifactId>container</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -55,6 +51,7 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!--
             <dependency>
                 <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
                 <artifactId>common</artifactId>
@@ -67,6 +64,7 @@
                 <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
+            -->
         </dependencies>
     </dependencyManagement>
 
@@ -88,13 +86,20 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- we also need the test classes -->
+        <!-- we also need the test classes? -->
+        <!--
         <dependency>
             <groupId>com.coyotesong.examples.spring-boot.databases</groupId>
             <artifactId>common</artifactId>
@@ -105,6 +110,7 @@
             <artifactId>jooq</artifactId>
             <classifier>tests</classifier>
         </dependency>
+        -->
     </dependencies>
 
     <profiles>
