@@ -17,6 +17,7 @@
 
 package com.coyotesong.examples.containers;
 
+import com.coyotesong.examples.containers.traits.ExtendsPostgreSQL;
 import com.coyotesong.examples.containers.traits.JdbcDatabaseContainerEnhancements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unused", "SqlNoDataSourceInspection", "SqlResolve", "JavadocBlankLines", "JavadocLinkAsPlainText"})
 public class EnhancedTimescaleContainer<SELF extends PostgreSQLContainer<SELF>> extends PostgreSQLContainer<SELF>
-        implements JdbcDatabaseContainerEnhancements<SELF> {
+        implements JdbcDatabaseContainerEnhancements<SELF>, ExtendsPostgreSQL<SELF> {
     private static final Logger LOG = LoggerFactory.getLogger(EnhancedTimescaleContainer.class);
 
     public static final DockerImageName DEFAULT_DOCKER_IMAGE_NAME = DockerImageName.parse("timescale/timescaledb:2.1.0-pg11");

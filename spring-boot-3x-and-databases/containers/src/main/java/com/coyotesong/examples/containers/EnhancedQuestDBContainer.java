@@ -17,6 +17,7 @@
 
 package com.coyotesong.examples.containers;
 
+import com.coyotesong.examples.containers.traits.ExtendsPostgreSQL;
 import com.coyotesong.examples.containers.traits.JdbcDatabaseContainerEnhancements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unused", "SqlNoDataSourceInspection", "SqlResolve", "JavadocBlankLines", "JavadocLinkAsPlainText"})
 public class EnhancedQuestDBContainer extends QuestDBContainer
-        implements JdbcDatabaseContainerEnhancements<QuestDBContainer> {
+        implements JdbcDatabaseContainerEnhancements<QuestDBContainer>, ExtendsPostgreSQL<QuestDBContainer> {
     private static final Logger LOG = LoggerFactory.getLogger(EnhancedQuestDBContainer.class);
 
     public static final DockerImageName DEFAULT_DOCKER_IMAGE_NAME = DockerImageName.parse("questdb/questdb:6.5.3");

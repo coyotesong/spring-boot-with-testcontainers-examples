@@ -17,6 +17,7 @@
 
 package com.coyotesong.examples.containers;
 
+import com.coyotesong.examples.containers.traits.ExtendsPostgreSQL;
 import com.coyotesong.examples.containers.traits.JdbcDatabaseContainerEnhancements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unused", "SqlNoDataSourceInspection", "SqlResolve", "JavadocBlankLines", "JavadocLinkAsPlainText"})
 public class EnhancedYugabyteDBContainer extends YugabyteDBYSQLContainer
-        implements JdbcDatabaseContainerEnhancements<YugabyteDBYSQLContainer> {
+        implements JdbcDatabaseContainerEnhancements<YugabyteDBYSQLContainer>, ExtendsPostgreSQL<YugayteDBYSQLContainer> {
     private static final Logger LOG = LoggerFactory.getLogger(EnhancedYugabyteDBContainer.class);
 
     public static final DockerImageName DEFAULT_DOCKER_IMAGE_NAME = DockerImageName.parse("yugabytedb/yugabyte:2.14.4.0-b26");

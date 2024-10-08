@@ -34,7 +34,8 @@ import java.util.function.Consumer;
  * See [TiDB Module](https://testcontainers.com/modules/tidb/)
  */
 @SuppressWarnings({"unused", "SqlNoDataSourceInspection", "SqlResolve", "JavadocBlankLines", "JavadocLinkAsPlainText"})
-public class EnhancedTiDBContainer extends TiDBContainer implements JdbcDatabaseContainerEnhancements<TiDBContainer> {
+public class EnhancedTiDBContainer extends TiDBContainer
+        implements JdbcDatabaseContainerEnhancements<TiDBContainer> {
     private static final Logger LOG = LoggerFactory.getLogger(EnhancedTiDBContainer.class);
 
     public static final DockerImageName DEFAULT_DOCKER_IMAGE_NAME = DockerImageName.parse("pingcap/tidb:v6.1.0");

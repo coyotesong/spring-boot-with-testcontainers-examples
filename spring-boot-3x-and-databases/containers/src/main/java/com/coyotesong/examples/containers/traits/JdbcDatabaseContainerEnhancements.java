@@ -18,6 +18,7 @@
 package com.coyotesong.examples.containers.traits;
 
 import com.coyotesong.examples.containers.EnhancedSlf4jLogConsumer;
+import com.coyotesong.examples.containers.GuestOSDetails;
 import com.coyotesong.examples.containers.PostConstructAction;
 import com.coyotesong.examples.containers.enhancements.DataSourceHelper;
 import com.coyotesong.examples.containers.enhancements.GuestOSDetailsHelper;
@@ -28,6 +29,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.output.BaseConsumer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -173,5 +175,14 @@ public interface JdbcDatabaseContainerEnhancements<SELF extends JdbcDatabaseCont
      */
     default HikariDataSource getDataSource() {
         return dataSourceHelper.get().getDataSource();
+    }
+
+    /**
+     * Get GuestOSDetails
+     *
+     * @return guest OS details
+     */
+    default GuestOSDetails getGuestOSDetails() throws IOException, SQLException {
+        return guestOSDetailsHelper.get().getGuestDetails();
     }
 }

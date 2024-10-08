@@ -1,0 +1,113 @@
+package com.coyotesong.examples.containers.traits;
+
+import org.testcontainers.containers.Container;
+import org.testcontainers.containers.Container.ExecResult;
+import org.testcontainers.containers.ExecConfig;
+
+import java.io.IOException;
+import java.util.*;
+
+/**
+ * Manage Redhat packages on container.
+ *
+ * This action will work on all containers, not just database containers.
+ * 
+ * ## Implementation notes
+ *
+ * - We can't use absolute paths since some distros use /usr/bin/dnf, some use /usr/sbin/dnf, etc.
+ *
+ * - More complex tasks should be handled by `ansible` playbooks. We can't rely on ansible
+ *   being installed on the host OS so we should install it on the container (`dnf install ansible-core`),
+ *   copy the playbook(s) to the container, and then run ansible locally.
+ *
+ * - Many Redhat-based distros require you to run
+ *   ```sh
+ *   dnf install -y epel-release
+ *   dnf update
+ *   ```
+ *   before you can install any servers.
+ *
+ * - I haven't found a way to disable the progress bars. (They're very annoying when looking at the
+ *   captured stdout.)
+ */
+@SuppressWarnings("JavadocBlankLines")
+public interface SupportsRedhatPackages {
+    String[] EMPTY_STRING_ARRAY = new String[0];
+
+    /**
+     * Update package information.
+     *
+     * This should only need to be called when additional packages will be installed.
+     *
+     * @param container container
+     * @return execution results
+     * @throws IOException an error occurred when communicating with the container
+     */
+    default Optional<ExecResult> updateRedhatPackages(Container<?> container) throws IOException {
+        final ExecConfig config = ExecConfig.builder()
+                .command(new String[] { "dnf", "update", "-y" })  // FIXME
+                .user("root")
+                .build();
+
+        try {
+            return Optional.of(container.execInContainer(config));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Upgrade installed packages.
+     *
+     * This should rarely be necessary - it's usually better to use an updated container.
+     *
+     * @param container container
+     * @return execution results
+     * @throws IOException an error occurred when communicating with the container
+     */
+    default Optional<ExecResult> upgradeRedhatPackages(Container<?> container) throws IOException {
+        final ExecConfig config = ExecConfig.builder()
+                .command(new String[] { "dnf", "upgrade", "-y" })  // FIXME
+                .user("root")
+                .build();
+
+        try {
+            return Optional.of(container.execInContainer(config));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Install one or more additional system packages.
+     *
+     * @param container container
+     * @param packageNames list of packages to install
+     * @return execution results
+     * @throws IOException an error occurred when communicating with the container
+     */
+    default Optional<ExecResult> installRedhatPackages(Container<?> container, String... packageNames) throws IOException {
+        final List<String> cmd = new ArrayList<>();
+        cmd.add("dnf");
+        cmd.add("install");   // FIXME
+        cmd.add("-y");
+        cmd.addAll(Arrays.asList(packageNames));
+
+        final ExecConfig config = ExecConfig.builder()
+                .command(cmd.toArray(EMPTY_STRING_ARRAY))
+                .user("root")
+                .build();
+
+        try {
+            return Optional.of(container.execInContainer(config));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return Optional.empty();
+    }
+}

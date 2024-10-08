@@ -84,6 +84,7 @@
         <module>common</module>
         <module>jooq</module>
         <module>shared-tests</module>
+        <module>postgresql-pljava</module>
     </modules>
 
     <properties>

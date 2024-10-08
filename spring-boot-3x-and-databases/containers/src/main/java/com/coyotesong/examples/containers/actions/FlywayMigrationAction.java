@@ -38,6 +38,9 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 public class FlywayMigrationAction implements PostConstructAction<JdbcDatabaseContainer<?>, Boolean> {
     private static final Logger LOG = LoggerFactory.getLogger(FlywayMigrationAction.class);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return "Use flyway to migrate database schema";

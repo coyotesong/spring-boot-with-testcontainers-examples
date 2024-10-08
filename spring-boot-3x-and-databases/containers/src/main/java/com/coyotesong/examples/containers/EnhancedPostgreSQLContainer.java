@@ -17,8 +17,7 @@
 
 package com.coyotesong.examples.containers;
 
-import com.coyotesong.examples.containers.traits.JdbcDatabaseContainerEnhancements;
-import com.coyotesong.examples.containers.traits.SupportsServerExtensions;
+import com.coyotesong.examples.containers.traits.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -37,7 +36,8 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings({"unused", "SqlNoDataSourceInspection", "SqlResolve", "JavadocBlankLines", "JavadocLinkAsPlainText"})
 public class EnhancedPostgreSQLContainer<SELF extends PostgreSQLContainer<SELF>> extends PostgreSQLContainer<SELF>
-        implements JdbcDatabaseContainerEnhancements<SELF>, SupportsServerExtensions {
+        implements JdbcDatabaseContainerEnhancements<SELF>, ExtendsPostgreSQL<SELF>, SupportsDebianPackages,
+        SupportsAlpinePackages, SupportsSoftBounce {
     private static final Logger LOG = LoggerFactory.getLogger(EnhancedPostgreSQLContainer.class);
 
     public static final DockerImageName DEFAULT_DOCKER_IMAGE_NAME = DockerImageName.parse("postgres:16.3");

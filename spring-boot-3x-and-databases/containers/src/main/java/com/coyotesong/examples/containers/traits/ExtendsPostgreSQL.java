@@ -18,6 +18,8 @@
 package com.coyotesong.examples.containers.traits;
 
 import com.coyotesong.examples.containers.DatabaseServerExtension;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import java.util.Properties;
  * This is currently limited to PostgreSQL databases.
  */
 @SuppressWarnings({"unused", "SqlSourceToSinkFlow", "JavadocBlankLines"})
-public interface SupportsServerExtensions extends JdbcDatabaseAware {
+public interface ExtendsPostgreSQL<SELF extends JdbcDatabaseContainer<SELF>> extends JdbcDatabaseAware {
 
     /**
      * List matching installed extensions
